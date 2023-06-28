@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+   <link name="camera_link">
+    <visual>
+      <geometry>
+        <box size="0.08 0.08 0.08"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+    <xacro:inertial_box mass="0.00005" x="0.08" y="0.08" z="0.08">
+    <origin xyz="0.0 0.09 0.31" rpy="0 0 0"/>
+    </xacro:inertial_box>
+  </link>
+
+ <joint name="camera_joint" type="fixed">
+    <parent link="arm_3"/>
+    <child link="camera_link"/>
+    <axis xyz="1 0 0"/>
+    <origin xyz="0.0 0.09 0.31"/>
+    <limit effort="1000.0" lower="-0.38" upper="0.38" velocity="0.5"/> <!-- Modify the limits here -->
+ </joint>
+
+
+  <link name="camera_lens">
+    <visual>
+      <geometry>
+        <cylinder radius="0.03" length="0.025"/>
+      </geometry>
+      <material name="cyan"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.01" length="0.02"/>
+      </geometry>
+    </collision>
+    <xacro:inertial_cylinder mass="0.000001" length="0.02" radius="0.01">
+    <origin xyz="0.0 0 0.05" rpy="0 0 0"/>
+    </xacro:inertial_cylinder>
+  </link>
+
+  <joint name="cameralens_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child link="camera_lens"/>
+    <axis xyz="0 1 0"/>
+    <origin xyz="0.0 0 0.05"/>
+    <limit effort="1000.0" lower="-2.5" upper="2.5" velocity="0.5"/>
+  </joint>
+
+  <!--gazebo>
+    <sensor name="camera" type="camera">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>10</update_rate>
+      <camera>
+        <horizontal_fov>1.089</horizontal_fov>
+        <image>
+          <format>R8G8B8</format>
+          <width>640</width>
+          <height>480</height>
+        </image>
+        <clip>
+          <near>0.05</near>
+          <far>8.0</far>
+        </clip>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <frame_name>camera_lens</frame_name>
+      </plugin>
+    </sensor>
+  
+  </gazebo-->
+
+    <!-- camera -->
+  <gazebo reference="camera_lens">
+    <sensor type="depth" name="camera1">
+      <update_rate>30.0</update_rate>
+      <camera name="head">
+        <horizontal_fov>1.3962634</horizontal_fov>
+        <image>
+          <width>800</width>
+          <height>800</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>rrbot/camera1</cameraName>
+        <imageTopicName>image_raw</imageTopicName>
+        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+        <frameName>camera_link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+</robot>
